@@ -1,6 +1,6 @@
 const BulkAction = require("../models/bulkActionSchema");
 const bulkService = require("../services/bulkService");
-const logger = require("../utils/logger")
+const logger = require("../utils/logger");
 const createBulkAction = async (req, res) => {
   try {
     const { accountId, operationType, records } = req.body;
@@ -73,7 +73,7 @@ const getBulkActionStats = async (req, res) => {
       return res.status(404).json({ error: "Bulk action not found" });
     }
 
-    res.json({
+    return res.status(200).json({
       actionId: bulkAction._id,
       totalRecords: bulkAction.totalRecords,
       successCount: bulkAction.successCount,
@@ -81,6 +81,7 @@ const getBulkActionStats = async (req, res) => {
       skippedCount: bulkAction.skippedCount,
       status: bulkAction.status,
     });
+    
   } catch (error) {
     logger.error("Error fetching bulk action stats:", error);
     res.status(500).json({ error: "Internal server error" });

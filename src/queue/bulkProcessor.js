@@ -33,6 +33,7 @@ bulkQueue.process(async (job, done) => {
     actionId,
     {
       $inc: { failureCount, successCount },
+      $set: { status: "processing" },
     },
     { new: true }
   );
@@ -44,7 +45,7 @@ bulkQueue.process(async (job, done) => {
   ) {
     await BulkAction.findByIdAndUpdate(actionId, { status: "complete" });
   }
-  
+
   if (remaining > 0) {
     logger.info(`Requeueing ${remaining} records for later processing...`);
     bulkQueue.add(
