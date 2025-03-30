@@ -1,6 +1,7 @@
 const bulkQueue = require("../config/queue");
 const Records = require("../models/recordsSchema");
 const FailedRecords = require("../models/failedRecordSchema");
+const logger = require("../utils/logger");
 
 const chunkArray = (array, size) => {
   const result = [];
@@ -21,7 +22,7 @@ async function bulkPushToQueue({
     records,
     process.env.RECORDS_TO_PROCESS_PER_MIN || 10
   );
-  console.log(recordChunks.length);
+
   for (const chunk of recordChunks) {
     await bulkQueue.add(
       { accountId, operationType, records: chunk, actionId },
@@ -52,11 +53,12 @@ const validateRecords = (records) => {
 
 const handleFailure = async (records, error) => {
   try {
+    logger.error(error.message);
     await FailedRecords.insertMany(
       records.map((data) => ({ ...data, errorMessage: error.message }))
     );
   } catch (error) {
-    console.log("soething went wrong", error.messag);
+    logger.error("soething went wrong", error.messag);
   }
 };
 const insertRecords = async (records, accountId) => {
@@ -110,7 +112,6 @@ const updateRecords = async (records, accountId) => {
 };
 
 const processRecords = async (operationType, records, accountId) => {
-  console.log(111,operationType, records.length, accountId)
   if (operationType === "insert") {
     return await insertRecords(
       records.map((data) => ({ ...data, accountId })),

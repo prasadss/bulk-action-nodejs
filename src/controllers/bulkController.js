@@ -1,6 +1,6 @@
 const BulkAction = require("../models/bulkActionSchema");
 const bulkService = require("../services/bulkService");
-
+const logger = require("../utils/logger")
 const createBulkAction = async (req, res) => {
   try {
     const { accountId, operationType, records } = req.body;
@@ -33,7 +33,7 @@ const createBulkAction = async (req, res) => {
       .status(201)
       .json({ actionId: bulkAction._id, message: "Bulk action initiated" });
   } catch (error) {
-    console.error("Error creating bulk action:", error);
+    logger.error("Error creating bulk action:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -59,7 +59,7 @@ const getBulkAction = async (req, res) => {
     });
     res.json(bulkAction);
   } catch (error) {
-    console.error("Error fetching bulk action:", error);
+    logger.error("Error fetching bulk action:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -82,7 +82,7 @@ const getBulkActionStats = async (req, res) => {
       status: bulkAction.status,
     });
   } catch (error) {
-    console.error("Error fetching bulk action stats:", error);
+    logger.error("Error fetching bulk action stats:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -106,7 +106,7 @@ const getBulkActionList = async (req, res) => {
       }))
     );
   } catch (error) {
-    console.error("Error fetching bulk action stats:", error);
+    logger.error("Error fetching bulk action stats:", error);
     re;
   }
 };
