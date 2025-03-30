@@ -56,7 +56,7 @@ REQUEUE_IN_SECONDS=60
 
 ### 1️⃣ **Submit Bulk Request**
 
-#### **POST /api/bulk**
+#### **POST /api/bulk-actions**
 
 Submit a bulk request for insert, update, or delete.
 
@@ -81,6 +81,56 @@ Submit a bulk request for insert, update, or delete.
 }
 ```
 
+#### **GET /api/bulk-actions**
+
+Submit a bulk request for insert, update, or delete.
+
+**Response:**
+
+```json
+[
+  {
+    "actionId": "67e94254e5bb0bab9d8a207d",
+    "successCount": 10,
+    "failureCount": 10,
+    "skippedCount": 0,
+    "status": "queued"
+  }
+]
+```
+
+#### **GET /api/bulk-actions/{actionId}**
+
+Submit a bulk request for insert, update, or delete.
+
+**Response:**
+
+```json
+{
+    "actionId": "67e94a37d22bb7ddecd93b5b",
+    "accountId": "12344112",
+    "status": "complete",
+    "operationType": "insert"
+}
+```
+
+#### **GET /api/bulk-actions/{actionId}/stats**
+
+Submit a bulk request for insert, update, or delete.
+
+**Response:**
+
+```json
+{
+    "actionId": "67e94a37d22bb7ddecd93b5b",
+    "totalRecords": 24,
+    "successCount": 24,
+    "failureCount": 0,
+    "skippedCount": 0,
+    "status": "complete"
+}
+```
+
 ---
 
 ## 🏗️ How It Works
@@ -91,13 +141,9 @@ Submit a bulk request for insert, update, or delete.
 4. Valid records are stored in the **Records collection**.
 5. Invalid records are stored in the **FailedRecords collection**.
 
----
-
-## 🛠️ Key Features
-
-✅ **Process records in chunks** to optimize DB operations.  
-✅ **Rate-limiting per account** (Max 10 records per minute).  
-✅ **Single queue for all bulk operations** (no separate queues per account).  
-✅ **Validations for unique keys & missing fields**.  
-✅ **Failed records stored separately**.
-
+Optional Enhancements:
+Rate Limiting: Implemented
+De-duplication:
+we can redis bloom filter to filter out duplicates
+Scheduling:
+Adding schedultedAT and scheduling the task in bulk queue accordingly

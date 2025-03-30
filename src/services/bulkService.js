@@ -10,7 +10,12 @@ const chunkArray = (array, size) => {
   return result;
 };
 
-async function bulkPushToQueue({ accountId, operationType, records }) {
+async function bulkPushToQueue({
+  accountId,
+  operationType,
+  records,
+  actionId,
+}) {
   //Size 10 is predefined but logic can be added to get user rate limit as per the subscription
   const recordChunks = chunkArray(
     records,
@@ -19,7 +24,7 @@ async function bulkPushToQueue({ accountId, operationType, records }) {
   console.log(recordChunks.length);
   for (const chunk of recordChunks) {
     await bulkQueue.add(
-      { accountId, operationType, records: chunk },
+      { accountId, operationType, records: chunk, actionId },
       { jobId: `${accountId}-${Date.now()}` }
     );
   }
@@ -45,6 +50,15 @@ const validateRecords = (records) => {
   return { validRecords, failedRecords };
 };
 
+const handleFailure = async (records, error) => {
+  try {
+    await FailedRecords.insertMany(
+      records.map((data) => ({ ...data, errorMessage: error.message }))
+    );
+  } catch (error) {
+    console.log("soething went wrong", error.messag);
+  }
+};
 const insertRecords = async (records, accountId) => {
   const { validRecords, failedRecords } = validateRecords(records);
 
@@ -55,15 +69,20 @@ const insertRecords = async (records, accountId) => {
     if (failedRecords.length > 0) {
       await FailedRecords.insertMany(failedRecords);
     }
+    return {
+      successCount: validRecords.length,
+      failureCount: failedRecords.length,
+    };
   } catch (error) {
-    await FailedRecords.insertMany(
-      records.map((data) => ({ ...data, errorMessage: error.message }))
-    );
+    handleFailure(records, error);
+    return {
+      successCount: 0,
+      failureCount: failedRecords.length,
+    };
   }
 };
 
 const updateRecords = async (records, accountId) => {
-  //TODO: validation for unique key and id for updating
   const { validRecords, failedRecords } = validateRecords(records);
 
   try {
@@ -77,20 +96,30 @@ const updateRecords = async (records, accountId) => {
     if (failedRecords.length > 0) {
       await FailedRecords.insertMany(failedRecords);
     }
+    return {
+      successCount: validRecords.length,
+      failureCount: failedRecords.length,
+    };
   } catch (error) {
-    console.error(`Update failed for ${accountId}:`, error);
+    handleFailure(records, error);
+    return {
+      successCount: 0,
+      failureCount: failedRecords.length,
+    };
   }
 };
 
 const processRecords = async (operationType, records, accountId) => {
+  console.log(111,operationType, records.length, accountId)
   if (operationType === "insert") {
-    await insertRecords(
+    return await insertRecords(
       records.map((data) => ({ ...data, accountId })),
       accountId
     );
   } else if (operationType === "update") {
-    await updateRecords(records, accountId);
+    return await updateRecords(records, accountId);
   }
+  return { failureCount: 0, successCount: 0 };
 };
 
 module.exports = {
