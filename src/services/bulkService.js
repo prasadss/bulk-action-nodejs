@@ -34,7 +34,6 @@ async function bulkPushToQueue({
 const validateRecords = (records) => {
   const validRecords = [];
   const failedRecords = [];
-  console.log( records)
 
   for (const record of records) {
     if (!record.email || !record.name) {
@@ -62,6 +61,7 @@ const handleFailure = async (records, error) => {
     logger.error("soething went wrong", error.messag);
   }
 };
+
 const insertRecords = async (records, accountId) => {
   const { validRecords, failedRecords } = validateRecords(records);
   try {

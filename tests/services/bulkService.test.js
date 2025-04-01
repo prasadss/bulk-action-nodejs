@@ -13,7 +13,6 @@ describe("Bulk Processor Service", () => {
       [{ email: "test@example.com", name: "test name" }],
       "acc123"
     );
-    console.log(result);
     expect(result.successCount).toBe(1);
     expect(result.failureCount).toBe(0);
   });

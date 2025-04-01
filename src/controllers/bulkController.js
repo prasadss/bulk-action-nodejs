@@ -96,7 +96,7 @@ const getBulkActionList = async (req, res) => {
       return res.status(404).json({ error: "Bulk action not found" });
     }
 
-    res.json(
+   return res.json(
       bulkActions.map((data) => ({
         actionId: data._id,
         totalRecords: data.totalRecords,
@@ -108,7 +108,7 @@ const getBulkActionList = async (req, res) => {
     );
   } catch (error) {
     logger.error("Error fetching bulk action stats:", error);
-    re;
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 module.exports = {
