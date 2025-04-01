@@ -3,6 +3,8 @@
 ## 📌 Overview
 
 This project is a bulk processing system that allows performing **bulk operations in chunks** while ensuring **rate-limiting per account ID**. The system uses **Bull queue** for background processing and **Redis** for rate limiting. All operations are validated, and failed records are stored separately.
+Bulk Action Upload Demo 🚀 - Watch Video
+https://www.loom.com/share/0a27208144b8438d97c67dc4a82fb47e
 
 ---
 
