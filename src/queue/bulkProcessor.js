@@ -6,7 +6,7 @@ const logger = require("../utils/logger");
 
 const REQUEUE_IN_SECONDS = process.env.REQUEUE_IN_SECONDS || 60;
 
-bulkQueue.process(async (job, done) => {
+const bulkProcessor = async (job, done) => {
   const { accountId, operationType, records, actionId } = job.data;
 
   const { allowed, remaining } = await recordProcessingRateLimiter(
@@ -55,6 +55,8 @@ bulkQueue.process(async (job, done) => {
   }
 
   done();
-});
+};
 
-module.exports = bulkQueue;
+bulkQueue.process(bulkProcessor);
+
+module.exports = { bulkQueue, bulkProcessor };
